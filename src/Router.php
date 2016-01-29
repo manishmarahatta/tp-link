@@ -271,10 +271,10 @@ class Router
      */
     public function getWANConfig()
     {
-        return $this->sendRequest(
+        return $this->parseWANConfig($this->sendRequest(
             '/userRpm/PPPoECfgRpm.htm',
             "http://{$this->host}/userRpm/WanCfgRpm.htm"
-        );
+        ));
     }
 
     /**
@@ -286,5 +286,20 @@ class Router
         if (strpos($response, 'HTTP/1.1 401') !== false) {
             throw new InvalidAuthException('Router username/password invalid.');
         }
+    }
+
+    /**
+     * Parse the current WAN configuration response.
+     * @param  string $response The response from the router.
+     * @return array            The array of current configuration.
+     */
+    private function parseWANConfig($response)
+    {
+        preg_match("/(?:var pppoeInf = new Array\()([\s\S]*?)(?:\))/", $response, $matches);
+        if (count($matches) != 2) {
+            throw new UnknownResponseException;
+        }
+
+        return explode(',', str_replace("\n", '', trim($matches[1])));
     }
 }
