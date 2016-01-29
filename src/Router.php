@@ -57,7 +57,7 @@ class Router
      * @param string $routerUsername The username for logging in to the router.
      * @param string $routerPassword The password for logging in to the router.
      */
-    public function __construct($host, $routerUsername = null, $routerPassword = null)
+    public function __construct($host = null, $routerUsername = null, $routerPassword = null)
     {
         $this->setHost($host);
         // Generate the auth string only if the
