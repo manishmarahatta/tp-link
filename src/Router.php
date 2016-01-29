@@ -2,6 +2,9 @@
 
 namespace NikhilPandey\TpLink;
 
+use NikhilPandey\TpLink\Exceptions\UndefinedAuthException;
+use NikhilPandey\TpLink\Exceptions\InvalidAuthException;
+
 class Router
 {
     /**
@@ -54,29 +57,36 @@ class Router
     /**
      * Set the host address.
      * @param string $host The host address.
+     * @return Router
      */
-    public function setHost($host){
+    public function setHost($host)
+    {
         $this->host = $host;
+
         return $this;
     }
 
     /**
      * Set the username.
      * @param string $username The username.
+     * @return  Router
      */
     public function setUsername($username)
     {
         $this->username = $username;
+
         return $this;
     }
 
     /**
      * Set the password.
      * @param string $password The password.
+     * @return  Router
      */
     public function setPassword($password)
     {
         $this->password = $password;
+
         return $this;
     }
 
@@ -84,10 +94,12 @@ class Router
      * Generate the basic authentication string.
      * @param  string $username The username for logging in to the router.
      * @param  string $password The password for logging in to the router.
+     * @return Router
      */
     public function setAuth($username, $password)
     {
         $this->auth = 'Basic '.base64_encode($username.':'.$password);
+
         return $this;
     }
 
@@ -95,6 +107,7 @@ class Router
      * Set both username and password.
      * @param string $username The username.
      * @param string $password The password.
+     * @return  Router
      */
     public function setUsernameAndPassword($username, $password)
     {
@@ -104,6 +117,7 @@ class Router
             $this->setUsername($username);
             $this->setPassword($password);
         }
+
         return $this;
     }
 
@@ -115,29 +129,34 @@ class Router
      */
     private function sendRequest($url, $referer)
     {
+        if (!$this->auth) {
+            throw new UndefinedAuthException('Router username/password undefined.');
+        }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "http://{$this->host}{$url}");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "Host: {$this->host}",
-            'User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language: en-US,en;q=0.5',
-            'Accept-Encoding: gzip, deflate',
+            // 'User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
+            // 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            // 'Accept-Language: en-US,en;q=0.5',
+            // 'Accept-Encoding: gzip, deflate',
             "Referer: {$referer}",
             "Authorization: {$this->auth}",
-            'Connection: keep-alive',
+            // 'Connection: keep-alive',
         ]);
-        $resp = curl_exec($ch);
+        $response = curl_exec($ch);
+        $this->checkForError($response);
         curl_close($ch);
 
-        return $resp;
+        return $response;
     }
 
     /**
      * Change the mac address of the router.
      * @param  string $mac The mac address.
-     * @return string|bool The response.
+     * @return Router
      */
     public function changeMacAddress($mac = null)
     {
@@ -146,6 +165,7 @@ class Router
             "/userRpm/MacCloneCfgRpm.htm?mac1={$mac}&wan=1&Save=Save",
             "http://{$this->host}/userRpm/MacCloneCfgRpm.htm"
         );
+
         return $this;
     }
 
@@ -153,7 +173,7 @@ class Router
      * Change the PPPoE user of the router but do not initiate the connection.
      * @param  string|null $username New username for the PPPoE connection.
      * @param  string|null $password The password for the PPPoE connection.
-     * @return string|bool           The response.
+     * @return Router
      */
     public function changeUser($username = null, $password = null)
     {
@@ -162,6 +182,7 @@ class Router
             "/userRpm/PPPoECfgRpm.htm?wan=0&wantype=2&acc={$username}&psw={$password}&confirm={$password}&SecType=0&sta_ip=0.0.0.0&sta_mask=0.0.0.0&linktype=2&Save=Save",
             "http://{$this->host}/userRpm/PPPoECfgRpm.htm"
         );
+
         return $this;
     }
 
@@ -170,11 +191,12 @@ class Router
      * @param  string|null $username New username for the PPPoE connection.
      * @param  string|null $password The password for the PPPoE connection.
      * @param  string|null $interval The interval to wait before reconnecting.
-     * @return string|bool           The response.
+     * @return Router
      */
     public function changeUserAndReconnect($username = null, $password = null, $interval = null)
     {
         $this->changeUser($username, $password);
+
         return $this->reconnect($interval);
     }
 
@@ -183,7 +205,7 @@ class Router
      * @param  string|null $username New username for the PPPoE connection.
      * @param  string|null $password The password for the PPPoE connection.
      * @param  string|null $interval The interval to wait before reconnecting.
-     * @return string|bool           The response.
+     * @return Router
      */
     public function connect($username = null, $password = null)
     {
@@ -193,6 +215,7 @@ class Router
             "/userRpm/PPPoECfgRpm.htm?wan=0&wantype=2&acc={$this->username}&psw={$this->password}&confirm={$this->password}&SecType=0&sta_ip=0.0.0.0&sta_mask=0.0.0.0&linktype=2&Connect=Connect",
             "http://{$this->host}/userRpm/PPPoECfgRpm.htm"
         );
+
         return $this;
     }
 
@@ -200,7 +223,7 @@ class Router
      * Disconnect the PPPoE connection and optionally change the user.
      * @param  string|null $username New username for the PPPoE connection.
      * @param  string|null $password The password for the PPPoE connection.
-     * @return string|bool           The response.
+     * @return Router
      */
     public function disconnect($username = null, $password = null)
     {
@@ -210,6 +233,7 @@ class Router
             "/userRpm/PPPoECfgRpm.htm?wan=0&wantype=2&acc={$this->username}&psw={$this->password}&confirm={$password}&SecType=0&sta_ip=0.0.0.0&sta_mask=0.0.0.0&linktype=2&Disconnect=Disconnect",
             "http://{$this->host}/userRpm/PPPoECfgRpm.htm"
         );
+
         return $this;
     }
 
@@ -218,19 +242,26 @@ class Router
      * @param  string|null $interval The interval to wait between connection.
      * @param  string|null $username New username for the PPPoE connection.
      * @param  string|null $password The password for the PPPoE connection.
-     * @return string|bool           The response.
+     * @return Router
      */
     public function reconnect($interval = null, $username = null, $password = null)
     {
         $this->disconnect()
             ->wait($interval)
             ->connect($username, $password);
+
         return $this;
     }
 
+    /**
+     * Sleeps for few seconds.
+     * @param  int $interval Seconds to wait for.
+     * @return Router
+     */
     public function wait($interval = null)
     {
         sleep(is_null($interval) ?: 10);
+
         return $this;
     }
 
@@ -238,13 +269,22 @@ class Router
      * Get the current router configuration.
      * @return string|bool The response.
      */
-    public function getRouterConfig()
+    public function getWANConfig()
     {
-        $response = $this->sendRequest(
+        return $this->sendRequest(
             '/userRpm/PPPoECfgRpm.htm',
             "http://{$this->host}/userRpm/WanCfgRpm.htm"
         );
+    }
 
-        return $response;
+    /**
+     * Checks for any error in the response.
+     * @param  string $response The response from the router.
+     */
+    private function checkForError($response)
+    {
+        if (strpos($response, 'HTTP/1.1 401') !== false) {
+            throw new InvalidAuthException('Router username/password invalid.');
+        }
     }
 }

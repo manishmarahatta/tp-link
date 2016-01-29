@@ -13,7 +13,6 @@ class TpLinkServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
     }
 
     /**
