@@ -19,7 +19,7 @@ class Router
     const CONNECTION_AUTO = 2;
     const CONNECTION_TIME_BASED = 3;
     const CONNECTION_MANUAL = 4;
-    
+
     /**
      * The IP address of the host.
      * @var string
@@ -151,13 +151,8 @@ class Router
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "Host: {$this->host}",
-            // 'User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-            // 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            // 'Accept-Language: en-US,en;q=0.5',
-            // 'Accept-Encoding: gzip, deflate',
             "Referer: {$referer}",
             "Authorization: {$this->auth}",
-            // 'Connection: keep-alive',
         ]);
         $response = curl_exec($ch);
         $this->checkForError($response);
