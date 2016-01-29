@@ -170,23 +170,6 @@ class Router
     }
 
     /**
-     * Change the PPPoE user of the router but do not initiate the connection.
-     * @param  string|null $username New username for the PPPoE connection.
-     * @param  string|null $password The password for the PPPoE connection.
-     * @return Router
-     */
-    public function changeUser($username = null, $password = null)
-    {
-        $this->setUsernameAndPassword($username, $password);
-        $this->sendRequest(
-            "/userRpm/PPPoECfgRpm.htm?wan=0&wantype=2&acc={$username}&psw={$password}&confirm={$password}&SecType=0&sta_ip=0.0.0.0&sta_mask=0.0.0.0&linktype=2&Save=Save",
-            "http://{$this->host}/userRpm/PPPoECfgRpm.htm"
-        );
-
-        return $this;
-    }
-
-    /**
      * Change the PPPoE user of the router and reconnect the PPPoE connection.
      * @param  string|null $username New username for the PPPoE connection.
      * @param  string|null $password The password for the PPPoE connection.
@@ -195,9 +178,7 @@ class Router
      */
     public function changeUserAndReconnect($username = null, $password = null, $interval = null)
     {
-        $this->changeUser($username, $password);
-
-        return $this->reconnect($interval);
+        return $this->reconnect($interval, $username, $password);
     }
 
     /**
@@ -261,7 +242,6 @@ class Router
     public function wait($interval = null)
     {
         sleep(is_null($interval) ?: 10);
-
         return $this;
     }
 
