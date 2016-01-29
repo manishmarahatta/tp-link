@@ -6,7 +6,12 @@ Control TP-Link 940/941ND router using PHP. This has been tested with `TP-Link 9
 `This package will not work if you have updated your router's firmware to the latest version as all the vulnerabilities have been patched.`
 
 ### Installation
-Add the following to your `composer.json`
+
+```
+composer require nikhil-pandey/tp-link:dev-master
+```
+
+Or add the following to your `composer.json`
 
 ```json
 "nikhil-pandey/tp-link": "dev-master"
