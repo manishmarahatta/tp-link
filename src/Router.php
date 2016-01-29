@@ -5,6 +5,7 @@ namespace NikhilPandey\TpLink;
 use NikhilPandey\TpLink\Exceptions\UndefinedAuthException;
 use NikhilPandey\TpLink\Exceptions\InvalidAuthException;
 use NikhilPandey\TpLink\Exceptions\UnknownResponseException;
+use NikhilPandey\TpLink\Exceptions\UndefinedHostException;
 
 class Router
 {
@@ -158,6 +159,9 @@ class Router
      */
     private function sendRequest($url, $referer)
     {
+        if (!$this->host) {
+            throw new UndefinedHostException('Host address not provided.');
+        }
         if (!$this->auth) {
             throw new UndefinedAuthException('Router username/password undefined.');
         }

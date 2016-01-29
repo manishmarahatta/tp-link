@@ -53,7 +53,7 @@ if($configuration['status'] == Router.CONNECTED){
 For more information about the constants and other stuffs, dive into the code :)
 
 ### Exceptions
-Three types of exceptions might occur. `InvalidAuthException`, `UndefinedAuthException` and `UnknownResponseException`. You can catch those and take appropriate actions.
+Four types of exceptions might occur. `InvalidAuthException`, `UndefinedAuthException` and `UnknownResponseException`, `UndefinedHostException`. You can catch those and take appropriate actions.
 ```php
 use NikhilPandey\TpLink\Router;
 use NikhilPandey\TpLink\Exceptions\InvalidAuthException
