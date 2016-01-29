@@ -8,13 +8,13 @@ Control TP-Link 940/941ND router using PHP. This has been tested with `TP-Link 9
 ### Installation
 
 ```
-composer require nikhil-pandey/tp-link:dev-master
+composer require nikhil-pandey/tp-link
 ```
 
 Or add the following to your `composer.json`
 
 ```json
-"nikhil-pandey/tp-link": "dev-master"
+"nikhil-pandey/tp-link": "^1.0"
 ```
 
 ###Usage
