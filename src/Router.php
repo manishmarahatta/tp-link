@@ -324,6 +324,6 @@ class Router
             throw new UnknownResponseException('Unknown response received.');
         }
 
-        return explode(',', str_replace("\n", '', trim($matches[1])));
+        return explode(',', str_replace(["\n", '"'], '', trim($matches[1])));
     }
 }
