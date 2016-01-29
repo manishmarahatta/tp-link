@@ -57,7 +57,7 @@ class Router
      * @param string $routerUsername The username for logging in to the router.
      * @param string $routerPassword The password for logging in to the router.
      */
-    public function __construct($host = null, $routerUsername = null, $routerPassword = null)
+    public function __construct($host, $routerUsername = null, $routerPassword = null)
     {
         $this->setHost($host);
         // Generate the auth string only if the
@@ -66,6 +66,16 @@ class Router
         if (!(is_null($routerUsername) || is_null($routerPassword))) {
             $this->setAuth($routerUsername, $routerPassword);
         }
+    }
+
+    /**
+     * Static way to create a new instnce.
+     * @param  string $host The address for the router.
+     * @return Router
+     */
+    public static function at($host)
+    {
+        return new static($host);
     }
 
     /**
@@ -125,11 +135,16 @@ class Router
      */
     public function setUsernameAndPassword($username, $password)
     {
-        // Change the username and password only if
-        // a username and password was supplied
-        if (!(is_null($username) || is_null($password))) {
-            $this->setUsername($username);
-            $this->setPassword($password);
+        // Use the username and password from the
+        // current configuration and use it if a
+        // username and password was not provided
+        if (is_null($username) && is_null($password)) {
+            $config = $this->getWANConfigAssoc();
+            $this->setUsername($config['username'])
+                ->setPassword($config['password']);
+        } else {
+            $this->setUsername($username)
+                ->setPassword($password);
         }
 
         return $this;
