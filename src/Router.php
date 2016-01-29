@@ -4,6 +4,7 @@ namespace NikhilPandey\TpLink;
 
 use NikhilPandey\TpLink\Exceptions\UndefinedAuthException;
 use NikhilPandey\TpLink\Exceptions\InvalidAuthException;
+use NikhilPandey\TpLink\Exceptions\UnknownResponseException;
 
 class Router
 {
@@ -289,7 +290,9 @@ class Router
      */
     private function checkForError($response)
     {
-        if (strpos($response, 'HTTP/1.1 401') !== false) {
+        if ($response == false) {
+            throw new UnknownResponseException('Unknown response received.');
+        } elseif (strpos($response, 'HTTP/1.1 401') !== false) {
             throw new InvalidAuthException('Router username/password invalid.');
         }
     }
@@ -303,7 +306,7 @@ class Router
     {
         preg_match("/(?:var pppoeInf = new Array\()([\s\S]*?)(?:\))/", $response, $matches);
         if (count($matches) != 2) {
-            throw new UnknownResponseException;
+            throw new UnknownResponseException('Unknown response received.');
         }
 
         return explode(',', str_replace("\n", '', trim($matches[1])));
