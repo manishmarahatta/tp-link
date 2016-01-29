@@ -7,6 +7,19 @@ use NikhilPandey\TpLink\Exceptions\InvalidAuthException;
 
 class Router
 {
+    const DISCONNECTED = 0;
+    const CONNECTED = 1;
+    const CONNECTING = 2;
+
+    const SECONDARY_DISABLED = 0;
+    const SECONDARY_DYNAMIC_IP = 1;
+    const SECONDARY_STATIC_IP = 2;
+
+    const CONNECTION_ON_DEMAND = 1;
+    const CONNECTION_AUTO = 2;
+    const CONNECTION_TIME_BASED = 3;
+    const CONNECTION_MANUAL = 4;
+    
     /**
      * The IP address of the host.
      * @var string
@@ -242,12 +255,13 @@ class Router
     public function wait($interval = null)
     {
         sleep(is_null($interval) ?: 10);
+
         return $this;
     }
 
     /**
      * Get the current router configuration.
-     * @return string|bool The response.
+     * @return array The configuration.
      */
     public function getWANConfig()
     {
@@ -255,6 +269,23 @@ class Router
             '/userRpm/PPPoECfgRpm.htm',
             "http://{$this->host}/userRpm/WanCfgRpm.htm"
         ));
+    }
+
+    /**
+     * Get the current router configuration as an associative array.
+     * @return array The configuration.
+     */
+    public function getWANConfigAssoc()
+    {
+        $config = $this->getWANConfig();
+
+        return [
+            'username' => $config[7],
+            'password' => $config[8],
+            'status' => $config[26],
+            'connection_mode' => $config[20],
+            'secondary_connection_type' => $config[29],
+        ];
     }
 
     /**
