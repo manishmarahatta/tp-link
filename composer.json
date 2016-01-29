@@ -1,0 +1,21 @@
+{
+    "name": "nikhil-pandey/tp-link",
+    "description": "A Package for controlling TP-Link 941ND router.",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.5",
+        "laravel/framework": "^5.1"
+    },
+    "authors": [
+        {
+            "name": "Nikhil Pandey",
+            "email": "nikhil@nikhil.com.np"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "NikhilPandey\\TpLink\\": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
