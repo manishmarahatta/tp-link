@@ -139,7 +139,7 @@ class Router
         // current configuration and use it if a
         // username and password was not provided
         if (is_null($username) && is_null($password)) {
-            $config = $this->getWANConfigAssoc();
+            $config = $this->getConfigAssoc();
             $this->setUsername($config['username'])
                 ->setPassword($config['password']);
         } else {
@@ -274,7 +274,7 @@ class Router
      * Get the current router configuration.
      * @return array The configuration.
      */
-    public function getWANConfig()
+    public function getConfig()
     {
         return $this->parseWANConfig($this->sendRequest(
             '/userRpm/PPPoECfgRpm.htm',
@@ -286,9 +286,9 @@ class Router
      * Get the current router configuration as an associative array.
      * @return array The configuration.
      */
-    public function getWANConfigAssoc()
+    public function getConfigAssoc()
     {
-        $config = $this->getWANConfig();
+        $config = $this->getConfig();
 
         return [
             'username' => $config[7],
